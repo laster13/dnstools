@@ -1,4 +1,4 @@
-#!/bin/sh -xv
+#!/bin/sh
 
 # Add Let's encrypt validation code to DNSSEC zone
 # v.20180325 2018 (c) Max Kostikov http://kostikov.co e-mail: max@kostikov.co
