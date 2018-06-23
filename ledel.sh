@@ -1,4 +1,4 @@
-#!/bin/sh -xv
+#!/bin/sh
 
 # Delete Let's encrypt validation code from DNSSEC zone
 # v.20180325 2018 (c) Max Kostikov http://kostikov.co e-mail: max@kostikov.co
