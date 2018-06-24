@@ -13,5 +13,5 @@ zone="${nsddir}/zones/db.${CERTBOT_DOMAIN}"
 sed -i.bak '/^_acme-challenge/d' $zone
 
 ${nsddir}/dnsnewserial.sh $zone
-
+docker exec -ti nsd signzone $CERTBOT_DOMAIN [YYYYMMDDhhmmss]
 docker exec -ti nsd nsd-control reload $CERTBOT_DOMAIN
