@@ -46,6 +46,7 @@ do
       ## I also only replace DANE records with certificate usage field '1'. That's how I make sure that the roll over DANE records (which have usage field '3') are left intact. 
                   sed -i "/_dane IN TLSA 3/c\_dane IN TLSA 3 0 1 $danezone ; old-dane-hash\n_dane IN TLSA 3 0 1 $danecert" $filename
                   ${nsddir}/dnsnewserial.sh $filename
+                  docker exec -ti nsd signzone $domainname [YYYYMMDDhhmmss]
                   docker exec -ti nsd nsd-control reload $domainname
       ## Print status to stdout
       echo [$domainname] Added new DANE hash in zonefile
@@ -61,6 +62,7 @@ do
         ## Old DANE hashes exist in the zonefile; remove lines ending with the comment 'old-dane-hash'
         sed -i "/old-dane-hash/d" $filename
         ${nsddir}/dnsnewserial.sh $filename
+        docker exec -ti nsd signzone $domainname [YYYYMMDDhhmmss]
         docker exec -ti nsd nsd-control reload $domainname
                               else
                                 ## No old DANE hashes exist in file; stop script and do nothing
