@@ -28,7 +28,7 @@ do
   danecert=$(exec echo $openssloutput | cut -f2 -d "=" | xargs)
   
   ## Now, let's check if certbot renewal (which is run every 12 hours on my Debian server) has resulted in a new certficate in the past hour
-  if (( $current_epoch - $cert_file_renewal_epoch < 70000  )); then
+  if (( $current_epoch - $cert_file_renewal_epoch < 3600  )); then
     ## Certbot has renewed the certificate less than an hour ago; add DANE hash of new certificate to DNS zonefile
 
         	## Check if the DANE hash from the new certificate ($danecert) already exists in the zone file.
