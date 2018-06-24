@@ -21,7 +21,7 @@ do
   filename="/mnt/docker/nsd/zones/db.$domainname"
   nsddir="/mnt/docker/nsd"
   ## Get dane hash from zonefile
-  danezone=$(exec cat $filename | grep "_dane" | cut -d " " -f7 | xargs)
+  danezone=$(exec cat $filename | grep "TLSA" | cut -d " " -f7 | xargs)
   ## Calculate dane SHA256 hash based on the Letsencrypt certificate
   openssloutput=$(openssl x509 -in /etc/letsencrypt/live/$domainname/cert.pem -outform DER | openssl sha256)
   ## Get DANE hash from openssl output
