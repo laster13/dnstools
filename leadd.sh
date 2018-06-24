@@ -20,7 +20,7 @@ zone="${nsddir}/zones/db.${maindom}"
 echo $str >> $zone
 
 ${nsddir}/dnsnewserial.sh $zone
-
+docker exec -ti nsd signzone $maindom [YYYYMMDDhhmmss]
 docker exec -ti nsd nsd-control reload $maindom
 
 sleep 10
