@@ -1,5 +1,41 @@
 #!/bin/bash
 
+## Script for automatically changing DANE TLSA hashes, after auto renewing Letsencrypt certificates 
+## Version: 20180617 
+
+#### LICENSE INFORMATION
+## Copyright 2018 Dennis Baaten (Baaten ICT Security) 
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##    http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+## See the License for the specific language governing permissions and
+## limitations under the License.
+
+#### ASSUMPTIONS WHILE MAKING THIS SCRIPT
+## This script should be run every hour using cron 
+## There is a DANE record present in the DNS zone (from the initial setup).
+## Using NSD as a DNS server
+## Root domain and www subdomain have the same certificate
+## Zonefile does only contain DANE hash for root domain and www subdomain
+## Default TLSA 1 0 1 is being used for all domains; being respectively the certificate usage field, the selector field, matching type field.
+
+#### VERSION HISTORY
+##
+## Version 20180615
+## - first release.
+##
+## Version 20180617
+## - fixed a bug where not all domains were processed.
+## - only replace DANE hashes with certificate usage 1. As a result trusted CA DANE records (usage type 3) are not affected.
+## - added print status to stdout.
+## 
 
 #### SCRIPT START
 
