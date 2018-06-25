@@ -9,7 +9,7 @@
 # Check arguments
 if [ $# -ne 1 ]
 then
-        echo "Provide /mnt/docker/nsd/zones/db.lastharo.pw as argument!"
+        echo "Provide /mnt/docker/nsd/zones/db.example.pw as argument!"
         exit 1
 fi
 
