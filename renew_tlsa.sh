@@ -51,7 +51,7 @@ do
   ## The current unix time (number of seconds since 1-1-1970)
   current_epoch="$(exec date '+%s')"
   ## The unix time of the last known modify date of the letsencrypt certificate file
-  cert_file_renewal_date="$(exec stat $(readlink -f /etc/letsencrypt/live/$domainname/cert.pem) | grep Modify | cut -f1 --complement -d " " | sed 's/^[ \t]*//;s/[ \t]*$//')"
+  cert_file_renewal_date="$(exec stat $(readlink -f /etc/letsencrypt/live/$domainname/cert.pem) | grep Modif | cut -f1 --complement -d " " | sed 's/^[ \t]*//;s/[ \t]*$//')"
   cert_file_renewal_epoch="$(date --date="$cert_file_renewal_date" +"%s")"
   ## Set full filename path using know directory structure and zonefile naming convention
   filename="/mnt/docker/nsd/zones/db.$domainname"
@@ -100,6 +100,7 @@ do
         ${nsddir}/dnsnewserial.sh $filename
         docker exec -ti nsd signzone $domainname [YYYYMMDDhhmmss]
         docker exec -ti nsd nsd-control reload $domainname
+        service nginx restart
                               else
                                 ## No old DANE hashes exist in file; stop script and do nothing
         ## Maybe this domain was already processed in a previous run of this script
