@@ -100,7 +100,7 @@ do
         ${nsddir}/dnsnewserial.sh $filename
         docker exec nsd signzone $domainname
         ## relancer nginx pour prendre en compte les nouveaux certificats
-        service nginx restart
+        /usr/sbin/nginx -s reload
                               else
                                 ## No old DANE hashes exist in file; stop script and do nothing
         ## Maybe this domain was already processed in a previous run of this script
