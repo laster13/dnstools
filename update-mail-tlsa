@@ -1,0 +1,21 @@
+#!/bin/bash
+
+DOMAIN="lastharo.com"
+LETS_ENCRYPT_LIVE_PATH="/etc/letsencrypt/live/${DOMAIN}"
+SLACK_HOOK=https://hooks.slack.com/services/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
+
+# Empreinte du certificat récupérée lors du renouvellement
+# par acme.sh à partir de lastharo.com
+fingerprint=$(openssl x509 -noout -in "${LETS_ENCRYPT_LIVE_PATH}/cert.pem" -fingerprint -sha256 | cut -c 20- | sed s/://g)
+
+# Mise à jour des certificats du serveur mail
+rsync -Lvr "${LETS_ENCRYPT_LIVE_PATH}/" "/mnt/docker/ssl/live/mail.${DOMAIN}"
+
+# Redémarrage du serveur mail suite au renouvellement des certificats
+# docker-compose -f /mnt/docker/docker-compose.yml restart mailserver
+docker restart mailserver
+
+# Mise à jour de l'enregistrement TLSA
+update-tlsa ${fingerprint,,}
+
+curl --silent -X POST --data-urlencode 'payload={"channel":"#général", "username":"acme-bot","text":"Le certificat SSL a été renouvelé sur lastharo.com. Les conteneurs nginx et mailserver ont été redémarrés automatiquement.","icon_emoji":":infomation_source:"}' $SLACK_HOOK >/dev/null 2>&1
