@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Auteur @Hardware de mondedie.fr
+
 SLACK_HOOK=https://hooks.slack.com/services/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
 
 # Empreinte du certificat récupérée lors du renouvellement
