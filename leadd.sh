@@ -19,7 +19,4 @@ fi
 zone="${nsddir}/zones/db.${maindom}"
 echo $str >> $zone
 
-${nsddir}/dnsnewserial.sh $zone
-docker exec nsd signzone $maindom
-
 sleep 10
