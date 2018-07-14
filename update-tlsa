@@ -1,0 +1,16 @@
+#!/bin/bash
+
+SLACK_HOOK=https://hooks.slack.com/services/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
+
+# Empreinte du certificat récupérée lors du renouvellement
+# par acme.sh à partir de mondedie-web
+fingerprint=$1
+
+domain="lastharo.com"
+zonename="db.${domain}"
+zonefile="/mnt/docker/nsd/zones/${zonename}"
+tlsa_line_number=$(grep -n TLSA $zonefile | cut -d : -f 1)
+tlsa_dns_record="_dane IN TLSA 3 0 1 ${fingerprint}"
+
+# Mise à jour de la zone DNS un nouvel enregistrement TLSA
+sed -i -e "${tlsa_line_number}s/.*/${tlsa_dns_record}/" $zonefile
