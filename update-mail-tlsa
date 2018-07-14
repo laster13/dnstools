@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Auteur @Hardware de mondedie.fr
+
 DOMAIN="lastharo.com"
 LETS_ENCRYPT_LIVE_PATH="/etc/letsencrypt/live/${DOMAIN}"
 SLACK_HOOK=https://hooks.slack.com/services/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
