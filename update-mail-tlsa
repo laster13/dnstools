@@ -20,4 +20,4 @@ docker restart mailserver
 # Mise à jour de l'enregistrement TLSA
 update-tlsa ${fingerprint,,}
 
-curl --silent -X POST --data-urlencode 'payload={"channel":"#général", "username":"acme-bot","text":"Le certificat SSL a été renouvelé sur lastharo.com. Les conteneurs nginx et mailserver ont été redémarrés automatiquement.","icon_emoji":":infomation_source:"}' $SLACK_HOOK >/dev/null 2>&1
+curl --silent -X POST --data-urlencode 'payload={"channel":"#général", "username":"acme-bot","text":"Le certificat SSL a été renouvelé sur example.com. Les conteneurs nginx et mailserver ont été redémarrés automatiquement.","icon_emoji":":infomation_source:"}' $SLACK_HOOK >/dev/null 2>&1
