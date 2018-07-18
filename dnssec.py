@@ -1,3 +1,5 @@
+# Auteur laster13 de mondedie.fr
+
 import xmlrpc.client
 import sys
 import os
