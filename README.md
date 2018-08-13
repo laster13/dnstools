@@ -1,7 +1,5 @@
 # dnstools
 
-<p>This is some text.</p>
-<scriptsrc="https://asciinema.org/a/14.js" id="asciicast-14" async></script>
-<p>This is some other text.</p>
+<a href="https://asciinema.org/a/14?autoplay=1"><img src="https://asciinema.org/a/14.png" width="836"/></a>
 
 https://mondedie.fr/d/10326-tuto-certificat-wilcard-et-serveur-dns-autoritaire-nsd-dnssec-docker
