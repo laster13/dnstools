@@ -4,5 +4,5 @@
 https://mondedie.fr/d/10326-tuto-certificat-wilcard-et-serveur-dns-autoritaire-nsd-dnssec-docker
 
 
-![grab-landing-page](dnstools/animation.svg)
+dnstools/animation.svg
 
