@@ -454,34 +454,37 @@ function install_services() {
 	echo ""
 }
 
-function config_post_compose() {
-	if [[ "$PROXYACCESS" == "URI" ]]; then
-		echo -e "${BLUE}### CONFIG POST COMPOSE ###${NC}"
-		#grep -R "jackett" "$INSTALLEDFILE" > /dev/null 2>&1
-		grep -R "sonarr" "$INSTALLEDFILE" > /dev/null 2>&1
-		if [[ "$?" == "0" ]]; then
-			echo -e " ${BWHITE}* Processing jackett config file...${NC}"
-			rm "/home/$SEEDUSER/jackett/config/ServerConfig.json" > /dev/null 2>&1
-			rm "/home/$SEEDUSER/sonarr/config/config.xml" > /dev/null 2>&1
-			# cp "$BASEDIR/includes/config/jackett.serverconfig.conf" "/home/$SEEDUSER/jackett/config/ServerConfig.json" > /dev/null 2>&1
-			cp "$BASEDIR/includes/config/sonarr.config.xml" "/home/$SEEDUSER/sonarr/config/config.xml" > /dev/null 2>&1
-			sed -i "s|%SEEDUSER%|$SEEDUSER|g" /home/$SEEDUSER/sonarr/config/config.xml
-			#docker restart jackett-$SEEDUSER
-			docker restart sonarr-$SEEDUSER > /dev/null 2>&1
-			checking_errors $?
-		fi
-	fi
+function docker_compose() {
+	echo -e "${BLUE}### DOCKERCOMPOSE ###${NC}"
+	ACTDIR="$PWD"
+	cd /home/$SEEDUSER/
+	echo -e " ${BWHITE}* Starting docker...${NC}"
+	service docker restart
+	checking_errors $?
+	echo -e " ${BWHITE}* Docker-composing, it may takes a long...${NC}"
+	docker-compose up -d > /dev/null 2>&1
+	checking_errors $?
+	echo ""
+	cd $ACTDIR
+	config_post_compose
 }
 
 function config_post_compose() {
 	if [[ "$PROXYACCESS" == "URI" ]]; then
 		echo -e "${BLUE}### CONFIG POST COMPOSE ###${NC}"
-		grep -R "jackett" "$INSTALLEDFILE" > /dev/null 2>&1
+		#grep -R "jackett" "$INSTALLEDFILE" > /dev/null 2>&1
+		grep -E "sonarr|radarr" "$INSTALLEDFILE" > /dev/null 2>&1
 		if [[ "$?" == "0" ]]; then
 			echo -e " ${BWHITE}* Processing jackett config file...${NC}"
-			rm "/home/$SEEDUSER/dockers/jackett/config/ServerConfig.json" > /dev/null 2>&1
-			cp "$BASEDIR/includes/config/jackett.serverconfig.conf" "/home/$SEEDUSER/dockers/jackett/config/ServerConfig.json" > /dev/null 2>&1
-			docker restart jackett-$SEEDUSER
+			rm "/home/$SEEDUSER/jackett/config/ServerConfig.json" > /dev/null 2>&1
+			rm "/home/$SEEDUSER/sonarr/config/config.xml" > /dev/null 2>&1
+			rm "/home/$SEEDUSER/radarr/config/config.xml" > /dev/null 2>&1
+			# cp "$BASEDIR/includes/config/jackett.serverconfig.conf" "/home/$SEEDUSER/jackett/config/ServerConfig.json" > /dev/null 2>&1
+			cp "$BASEDIR/includes/config/sonarr.config.xml" "/home/$SEEDUSER/sonarr/config/config.xml" > /dev/null 2>&1
+			#cp "$BASEDIR/includes/config/radarr.config.xml" "/home/$SEEDUSER/sonarr/config/config.xml" > /dev/null 2>&1
+			sed -i "s|%SEEDUSER%|$SEEDUSER|g" /home/$SEEDUSER/sonarr/config/config.xml
+			#docker restart jackett-$SEEDUSER
+			docker restart sonarr-$SEEDUSER > /dev/null 2>&1
 			checking_errors $?
 		fi
 	fi
