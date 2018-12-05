@@ -1,0 +1,17 @@
+
+#STARTjackett#
+jackett-%USER%:
+  restart: always
+  image : linuxserver/jackett
+  container_name: jackett-%USER%
+  environment:
+    - PGID=%UID%
+    - PUID=%GID%
+    - TZ=%TIMEZONE%
+  ports:
+    - %PORT%:9117
+  volumes:
+    - /etc/localtime:/etc/locatime:ro
+    - /home/%USER%/dockers/jackett/config:/config:rw
+    - /home/%USER%/dockers/jackett/downloads:/downloads:rw
+#ENDjackett#

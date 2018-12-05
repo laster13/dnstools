@@ -1,0 +1,19 @@
+
+#STARTlufi#
+lufi-%USER%:
+  restart: always
+  image: xataz/lufi
+  container_name: lufi-%USER%
+  environment:
+    - UID=%UID%
+    - GID=%GID%
+    - WEBROOT=/lufi
+    - SECRET=%SECRET%
+    - CONTACT=%EMAIL%
+    - MAX_FILE_SIZE=250000000
+  ports:
+    - %PORT%:8080
+  volumes:
+    - /home/%USER%/dockers/lufi/data:/data
+    - /home/%USER%/dockers/lufi/files:/files
+#ENDlufi#

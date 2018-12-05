@@ -1,0 +1,37 @@
+
+#STARTrtorrent#
+version: '3'
+
+services:
+
+  rtorrent-%USER%:
+    image: xataz/rtorrent-rutorrent
+    container_name: rtorrent-%USER%
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.frontend.rule=Host:%DOMAIN%;PathPrefix:/%USER%_rtorrent
+      - traefik.frontend.auth.basic=%VAR%
+      - traefik.port=8080
+      - traefik.docker.network=traefik_proxy
+    environment:
+      - UID=%UID%
+      - GID=%GID%
+      - WEBROOT=/%USER%_rtorrent
+    ports:
+      - %PORT%:45000
+    volumes:
+      - /home/%USER%/rtorrent/torrents:/data/torrents
+      - /home/%USER%/rtorrent/watch:/data/.watch
+      - /home/%USER%/rtorrent/data:/data
+      - /home/%USER%/rtorrent/config:/config
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    external:
+      name: traefik_proxy
+#ENDrtorrent#
+
+

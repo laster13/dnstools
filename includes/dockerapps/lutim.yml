@@ -1,0 +1,19 @@
+
+#STARTlutil#
+lutim-%USER%:
+  restart: always
+  image: xataz/lutim
+  container_name: lutim-%USER%
+  environment:
+    - UID=%UID%
+    - GID=%GID%
+    - WEBROOT=/lutim
+    - SECRET=%SECRET%
+    - CONTACT=%EMAIL%
+    - MAX_FILE_SIZE=250000000
+  ports:
+    - %PORT%:8181
+  volumes:
+    - /home/%USER%/dockers/lutim/data:/data
+    - /home/%USER%/dockers/lutim/files:/lutim/files
+#ENDlutim#

@@ -1,0 +1,36 @@
+#STARTsonarr#
+version: '3'
+
+services:
+
+  sonarr-%USER%:
+    image: linuxserver/sonarr
+    container_name: sonarr-%USER%
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.frontend.rule=Host:%DOMAIN%;PathPrefix:/%USER%_sonarr
+      - traefik.frontend.auth.basic=%VAR%
+      - traefik.port=8989
+      - traefik.docker.network=traefik_proxy
+    environment:
+      - UID=%UID%
+      - GID=%GID%
+      - WEBROOT=/%USER%_sonarr
+    volumes:
+      - /home/%USER%/sonarr/config:/config
+      - /home/%USER%/rtorrent/torrents:/data/torrents
+      - /home/%USER%/sonarr/TV:/tv
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    external:
+      name: traefik_proxy
+#ENDsonarr#
+
+
+
+
+
