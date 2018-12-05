@@ -473,18 +473,26 @@ function config_post_compose() {
 	if [[ "$PROXYACCESS" == "URI" ]]; then
 		echo -e "${BLUE}### CONFIG POST COMPOSE ###${NC}"
 		#grep -R "jackett" "$INSTALLEDFILE" > /dev/null 2>&1
-		grep -E "sonarr|radarr" "$INSTALLEDFILE" > /dev/null 2>&1
-		if [[ "$?" == "0" ]]; then
+		APPLI=$(grep -E "sonarr|radarr" "$INSTALLEDFILE" > /dev/null 2>&1)
+		if [[ "$APPLI" == "jackett" ]]; then
 			echo -e " ${BWHITE}* Processing jackett config file...${NC}"
 			rm "/home/$SEEDUSER/jackett/config/ServerConfig.json" > /dev/null 2>&1
+			cp "$BASEDIR/includes/config/jackett.serverconfig.conf" "/home/$SEEDUSER/jackett/config/ServerConfig.json" > /dev/null 2>&1
+			docker restart jackett-$SEEDUSER > /dev/null 2>&1
+			checking_errors $?
+			
+		elif [[ "$APPLI" == "sonarr" ]]; then
+			echo -e " ${BWHITE}* Processing sonarr config file...${NC}"
 			rm "/home/$SEEDUSER/sonarr/config/config.xml" > /dev/null 2>&1
-			rm "/home/$SEEDUSER/radarr/config/config.xml" > /dev/null 2>&1
-			# cp "$BASEDIR/includes/config/jackett.serverconfig.conf" "/home/$SEEDUSER/jackett/config/ServerConfig.json" > /dev/null 2>&1
 			cp "$BASEDIR/includes/config/sonarr.config.xml" "/home/$SEEDUSER/sonarr/config/config.xml" > /dev/null 2>&1
-			#cp "$BASEDIR/includes/config/radarr.config.xml" "/home/$SEEDUSER/sonarr/config/config.xml" > /dev/null 2>&1
 			sed -i "s|%SEEDUSER%|$SEEDUSER|g" /home/$SEEDUSER/sonarr/config/config.xml
-			#docker restart jackett-$SEEDUSER
 			docker restart sonarr-$SEEDUSER > /dev/null 2>&1
+			checking_errors $?
+			
+		elif [[ "$APPLI" == "radarr" ]]; then
+			echo -e " ${BWHITE}* Processing radarr config file...${NC}"
+			cp "$BASEDIR/includes/config/radarr.config.xml" "/home/$SEEDUSER/sonarr/config/config.xml" > /dev/null 2>&1
+			rm "/home/$SEEDUSER/radarr/config/config.xml" > /dev/null 2>&1
 			checking_errors $?
 		fi
 	fi
