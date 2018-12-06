@@ -420,7 +420,7 @@ function install_services() {
 				"Do you want to use a different subdomain for $line ? default :" 7 75 "$FQDNTMP" 3>&1 1>&2 2>&3)
 				ACCESSURL=$FQDN
 				check_domain $ACCESSURL
-				TRAEFIK_URL=$(Host:traefik.$DOMAIN)
+				TRAEFIK_URL=$(Host:$ACCESSURL)
 				sed -i "s|%TRAEFIK_URL%|$TRAEFIK_URL|g" $DOCKERCOMPOSEFILE
 				echo "$line-$PORT-$FQDN" >> $INSTALLEDFILE
 				URI="/"
@@ -501,7 +501,7 @@ function add_install_services() {
 				FQDN=$(whiptail --title "SSL Subdomain" --inputbox \
 				"Do you want to use a different subdomain for $line ? default :" 7 75 "$FQDNTMP" 3>&1 1>&2 2>&3)
 				ACCESSURL=$FQDN
-				TRAEFIK_URL=$(Host:traefik.$DOMAIN)
+				TRAEFIK_URL=$(Host:$ACCESSURL)
 				sed -i "s|%TRAEFIK_URL%|$TRAEFIK_URL|g" $DOCKERCOMPOSEFILE
 				check_domain $ACCESSURL
 				echo "$line-$PORT-$FQDN" >> $INSTALLEDFILE
@@ -564,23 +564,25 @@ function config_post_compose() {
 	if [[ "$PROXYACCESS" == "URI" ]]; then
 		echo -e "${BLUE}### CONFIG POST COMPOSE ###${NC}"
 		#grep -R "jackett" "$INSTALLEDFILE" > /dev/null 2>&1
-		APPLI=$(grep -E "sonarr|radarr" "$INSTALLEDFILE" > /dev/null 2>&1)
+		APPLI=$(grep -E "jackett|sonarr|radarr" "$INSTALLEDFILE" > /dev/null 2>&1)
 		if [[ "$APPLI" == "jackett" ]]; then
 			echo -e " ${BWHITE}* Processing jackett config file...${NC}"
 			rm "/home/$SEEDUSER/jackett/config/ServerConfig.json" > /dev/null 2>&1
 			cp "$BASEDIR/includes/config/jackett.serverconfig.conf" "/home/$SEEDUSER/jackett/config/ServerConfig.json" > /dev/null 2>&1
 			docker restart jackett-$SEEDUSER > /dev/null 2>&1
 			checking_errors $?
+		fi
 			
-		elif [[ "$APPLI" == "sonarr" ]]; then
+		if [[ "$APPLI" == "sonarr" ]]; then
 			echo -e " ${BWHITE}* Processing sonarr config file...${NC}"
 			rm "/home/$SEEDUSER/sonarr/config/config.xml" > /dev/null 2>&1
 			cp "$BASEDIR/includes/config/sonarr.config.xml" "/home/$SEEDUSER/sonarr/config/config.xml" > /dev/null 2>&1
 			sed -i "s|%SEEDUSER%|$SEEDUSER|g" /home/$SEEDUSER/sonarr/config/config.xml
 			docker restart sonarr-$SEEDUSER > /dev/null 2>&1
 			checking_errors $?
+		fi
 			
-		elif [[ "$APPLI" == "radarr" ]]; then
+		if [[ "$APPLI" == "radarr" ]]; then
 			echo -e " ${BWHITE}* Processing radarr config file...${NC}"
 			cp "$BASEDIR/includes/config/radarr.config.xml" "/home/$SEEDUSER/radarr/config/config.xml" > /dev/null 2>&1
 			rm "/home/$SEEDUSER/radarr/config/config.xml" > /dev/null 2>&1
