@@ -1,9 +1,5 @@
 
 #STARTrtorrent#
-version: '3'
-
-services:
-
   rtorrent-%USER%:
     image: xataz/rtorrent-rutorrent
     container_name: rtorrent-%USER%
@@ -27,11 +23,3 @@ services:
       - /home/%USER%/rtorrent/config:/config
     networks:
       - proxy
-
-networks:
-  proxy:
-    external:
-      name: traefik_proxy
-#ENDrtorrent#
-
-

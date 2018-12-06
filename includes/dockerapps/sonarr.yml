@@ -1,8 +1,5 @@
+
 #STARTsonarr#
-version: '3'
-
-services:
-
   sonarr-%USER%:
     image: linuxserver/sonarr
     container_name: sonarr-%USER%
@@ -23,14 +20,3 @@ services:
       - /home/%USER%/sonarr/TV:/tv
     networks:
       - proxy
-
-networks:
-  proxy:
-    external:
-      name: traefik_proxy
-#ENDsonarr#
-
-
-
-
-

@@ -1,7 +1,3 @@
-#STARTradarr#
-version: '3'
-
-services:
 
   radarr-%USER%:
     image: linuxserver/radarr
@@ -23,14 +19,3 @@ services:
       - /home/%USER%/radarr/TV:/tv
     networks:
       - proxy
-
-networks:
-  proxy:
-    external:
-      name: traefik_proxy
-#ENDradarr#
-
-
-
-
-

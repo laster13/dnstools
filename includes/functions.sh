@@ -394,6 +394,7 @@ function install_services() {
 	for line in $(cat $SERVICESPERUSER);
 	do
 		#check_domain "$line.$DOMAIN"
+		cat /opt/seedbox-compose/includes/dockerapps/head.docker > $DOCKERCOMPOSEFILE
 		cat "/opt/seedbox-compose/includes/dockerapps/$line.yml" >> $DOCKERCOMPOSEFILE
 		sed -i "s|%TIMEZONE%|$TIMEZONE|g" $DOCKERCOMPOSEFILE
 		sed -i "s|%UID%|$USERID|g" $DOCKERCOMPOSEFILE
@@ -404,6 +405,7 @@ function install_services() {
 		sed -i "s|%USER%|$SEEDUSER|g" $DOCKERCOMPOSEFILE
 		sed -i "s|%EMAIL%|$CONTACTEMAIL|g" $DOCKERCOMPOSEFILE
 		sed -i "s|%IPADDRESS%|$IPADDRESS|g" $DOCKERCOMPOSEFILE
+		cat /opt/seedbox-compose/includes/dockerapps/foot.docker >> $DOCKERCOMPOSEFILE
 
 		SUBURI=$(whiptail --title "Access Type" --menu \
 	            "Please choose how do you want access your Apps :" 10 45 2 \
@@ -438,6 +440,8 @@ function install_services() {
 		FQDN=""
 		FQDNTMP=""
 	done
+
+
 	docker ps | grep watchtower > /dev/null 2>&1
 	if [[ "$?" != 0 ]]; then
 		if (whiptail --title "Docker Watcher" --yesno "Do you want to install a Watcher to auto-update your containers ?" 8 80) then
@@ -453,6 +457,85 @@ function install_services() {
 	echo $PORT >> $FILEPORTPATH
 	echo ""
 }
+
+function add_install_services() {
+	INSTALLEDFILE="/home/$SEEDUSER/resume"
+	touch $INSTALLEDFILE > /dev/null 2>&1
+	if [[ -f "$FILEPORTPATH" ]]; then
+		declare -i PORT=$(cat $FILEPORTPATH | tail -1)
+	else
+		declare -i PORT=$FIRSTPORT
+	fi
+
+	DOCKERCOMPOSEFILE="/home/$SEEDUSER/docker-compose.yml"
+	#sed -i  -n -e :a -e '1,5!{P;N;D;};N;ba' $DOCKERCOMPOSEFILE
+	for line in $(cat $SERVICESPERUSER);
+	do
+		#check_domain "$line.$DOMAIN"
+		sed -i -n -e :a -e '1,5!{P;N;D;};N;ba' $DOCKERCOMPOSEFILE
+		cat "/opt/seedbox-compose/includes/dockerapps/$line.yml" >> $DOCKERCOMPOSEFILE
+		sed -i "s|%TIMEZONE%|$TIMEZONE|g" $DOCKERCOMPOSEFILE
+		sed -i "s|%UID%|$USERID|g" $DOCKERCOMPOSEFILE
+		sed -i "s|%GID%|$GRPID|g" $DOCKERCOMPOSEFILE
+		sed -i "s|%PORT%|$PORT|g" $DOCKERCOMPOSEFILE
+		sed -i "s|%VAR%|$VAR|g" $DOCKERCOMPOSEFILE
+		sed -i "s|%DOMAIN%|$DOMAIN|g" $DOCKERCOMPOSEFILE
+		sed -i "s|%USER%|$SEEDUSER|g" $DOCKERCOMPOSEFILE
+		sed -i "s|%EMAIL%|$CONTACTEMAIL|g" $DOCKERCOMPOSEFILE
+		sed -i "s|%IPADDRESS%|$IPADDRESS|g" $DOCKERCOMPOSEFILE
+		cat /opt/seedbox-compose/includes/dockerapps/foot.docker >> $DOCKERCOMPOSEFILE
+
+		SUBURI=$(whiptail --title "Access Type" --menu \
+	            "Please choose how do you want access your Apps :" 10 45 2 \
+	            "1" "Subdomains" \
+	            "2" "URI" 3>&1 1>&2 2>&3)
+
+	    	case $SUBURI in
+	        	"1" )
+				PROXYACCESS="SUBDOMAIN"
+				FQDNTMP="$line.$DOMAIN"
+				FQDN=$(whiptail --title "SSL Subdomain" --inputbox \
+				"Do you want to use a different subdomain for $line ? default :" 7 75 "$FQDNTMP" 3>&1 1>&2 2>&3)
+				ACCESSURL=$FQDN
+				check_domain $ACCESSURL
+				echo "$line-$PORT-$FQDN" >> $INSTALLEDFILE
+				URI="/"
+	        	;;
+
+	        	"2" )
+				PROXYACCESS="URI"
+				FQDN=$DOMAIN
+				FQDNTMP="/$SEEDUSER"_"$line"
+				ACCESSURL=$(whiptail --title "SSL Subdomain" --inputbox \
+				"Do you want to use a different URI for $line ? default :" 7 75 "$FQDNTMP" 3>&1 1>&2 2>&3)
+				URI=$ACCESSURL
+				check_domain $DOMAIN
+				echo "$line-$PORT-$FQDN"/"$SEEDUSER"_"$line" >> $INSTALLEDFILE
+			;;
+				
+	    	esac
+		PORT=$PORT+1
+		FQDN=""
+		FQDNTMP=""
+	done
+
+
+	docker ps | grep watchtower > /dev/null 2>&1
+	if [[ "$?" != 0 ]]; then
+		if (whiptail --title "Docker Watcher" --yesno "Do you want to install a Watcher to auto-update your containers ?" 8 80) then
+			echo -e " ${BWHITE}--> Watchtower will be installed !${NC}"
+			cat "/opt/seedbox-compose/includes/dockerapps/watchtower.yml" >> $DOCKERCOMPOSEFILE
+			checking_errors $?
+		else
+			echo -e " ${BWHITE}--> Watchtower will be skipped !${NC}"
+		fi
+	else
+		echo -e " ${BWHITE}--> Watchtower already running !${NC}"
+	fi
+	echo $PORT >> $FILEPORTPATH
+	echo ""
+}
+
 
 function docker_compose() {
 	echo -e "${BLUE}### DOCKERCOMPOSE ###${NC}"
@@ -491,7 +574,7 @@ function config_post_compose() {
 			
 		elif [[ "$APPLI" == "radarr" ]]; then
 			echo -e " ${BWHITE}* Processing radarr config file...${NC}"
-			cp "$BASEDIR/includes/config/radarr.config.xml" "/home/$SEEDUSER/sonarr/config/config.xml" > /dev/null 2>&1
+			cp "$BASEDIR/includes/config/radarr.config.xml" "/home/$SEEDUSER/radarr/config/config.xml" > /dev/null 2>&1
 			rm "/home/$SEEDUSER/radarr/config/config.xml" > /dev/null 2>&1
 			checking_errors $?
 		fi
@@ -513,6 +596,13 @@ function valid_htpasswd() {
 	fi
 }
 
+function add_app_htpasswd() {
+	if [[ -d "/etc/seedboxcompose/" ]]; then
+		HTFOLDER="/etc/seedboxcompose/passwd/"
+		HTFILE=".htpasswd-$SEEDUSER"
+		VAR=$(sed -e 's/\$/\$$/g' "$HTFOLDER$HTFILE")
+	fi
+}
 
 function manage_users() {
 	echo -e "${BLUE}##########################################${NC}"
@@ -574,7 +664,8 @@ function manage_apps() {
 	case $ACTIONONAPP in
 		"1" ) ## ADDING APP
 				choose_services
-				install_services
+				add_app_htpasswd
+				add_install_services
 				docker_compose
 				resume_seedbox
 				backup_docker_conf
