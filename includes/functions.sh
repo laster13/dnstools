@@ -420,6 +420,8 @@ function install_services() {
 				"Do you want to use a different subdomain for $line ? default :" 7 75 "$FQDNTMP" 3>&1 1>&2 2>&3)
 				ACCESSURL=$FQDN
 				check_domain $ACCESSURL
+				TRAEFIK_URL=$(Host:traefik.$DOMAIN)
+				sed -i "s|%TRAEFIK_URL%|$TRAEFIK_URL|g" $DOCKERCOMPOSEFILE
 				echo "$line-$PORT-$FQDN" >> $INSTALLEDFILE
 				URI="/"
 	        	;;
@@ -431,6 +433,8 @@ function install_services() {
 				ACCESSURL=$(whiptail --title "SSL Subdomain" --inputbox \
 				"Do you want to use a different URI for $line ? default :" 7 75 "$FQDNTMP" 3>&1 1>&2 2>&3)
 				URI=$ACCESSURL
+				TRAEFIK_URL=$(Host:$DOMAIN;PathPrefix:$ACCESSURL)
+				sed -i "s|%TRAEFIK_URL%|$TRAEFIK_URL|g" $DOCKERCOMPOSEFILE
 				check_domain $DOMAIN
 				echo "$line-$PORT-$FQDN"/"$SEEDUSER"_"$line" >> $INSTALLEDFILE
 			;;
@@ -497,6 +501,8 @@ function add_install_services() {
 				FQDN=$(whiptail --title "SSL Subdomain" --inputbox \
 				"Do you want to use a different subdomain for $line ? default :" 7 75 "$FQDNTMP" 3>&1 1>&2 2>&3)
 				ACCESSURL=$FQDN
+				TRAEFIK_URL=$(Host:traefik.$DOMAIN)
+				sed -i "s|%TRAEFIK_URL%|$TRAEFIK_URL|g" $DOCKERCOMPOSEFILE
 				check_domain $ACCESSURL
 				echo "$line-$PORT-$FQDN" >> $INSTALLEDFILE
 				URI="/"
@@ -509,6 +515,8 @@ function add_install_services() {
 				ACCESSURL=$(whiptail --title "SSL Subdomain" --inputbox \
 				"Do you want to use a different URI for $line ? default :" 7 75 "$FQDNTMP" 3>&1 1>&2 2>&3)
 				URI=$ACCESSURL
+				TRAEFIK_URL=$(Host:$DOMAIN;PathPrefix:$ACCESSURL)
+				sed -i "s|%TRAEFIK_URL%|$TRAEFIK_URL|g" $DOCKERCOMPOSEFILE
 				check_domain $DOMAIN
 				echo "$line-$PORT-$FQDN"/"$SEEDUSER"_"$line" >> $INSTALLEDFILE
 			;;
