@@ -7,12 +7,12 @@
       - traefik.enable=true
       - traefik.frontend.rule=%TRAEFIKURL%
       - traefik.frontend.auth.basic=%VAR%
-      - traefik.port=8989
+      - traefik.port=7878
       - traefik.docker.network=traefik_proxy
     environment:
       - PUID=%UID%
       - PGID=%GID%
-      - WEBROOT=/%USER%_radarr
+      - WEBROOT=%URI%
     volumes:
       - /home/%USER%/radarr/config:/config
       - /home/%USER%/rtorrent/torrents:/data/torrents

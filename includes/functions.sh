@@ -569,6 +569,7 @@ function config_post_compose() {
 			rm "/home/$SEEDUSER/sonarr/config/config.xml" > /dev/null 2>&1
 			cp "$BASEDIR/includes/config/sonarr.config.xml" "/home/$SEEDUSER/sonarr/config/config.xml" > /dev/null 2>&1
 			sed -i "s|%URI%|$URI|g" /home/$SEEDUSER/sonarr/config/config.xml
+			sed -i "s|%URI%|$URI|g" /home/$SEEDUSER/docker-compose.yml
 			docker restart sonarr-$SEEDUSER > /dev/null 2>&1
 			checking_errors $?
 		fi
@@ -579,6 +580,7 @@ function config_post_compose() {
 			rm "/home/$SEEDUSER/radarr/config/config.xml" > /dev/null 2>&1
 			cp "$BASEDIR/includes/config/radarr.config.xml" "/home/$SEEDUSER/radarr/config/config.xml" > /dev/null 2>&1
 			sed -i "s|%URI%|$URI|g" /home/$SEEDUSER/radarr/config/config.xml
+			sed -i "s|%URI%|$URI|g" /home/$SEEDUSER/docker-compose.yml
 			docker restart radarr-$SEEDUSER > /dev/null 2>&1
 			checking_errors $?
 		fi

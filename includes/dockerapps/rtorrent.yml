@@ -13,7 +13,7 @@
     environment:
       - UID=%UID%
       - GID=%GID%
-      - WEBROOT=/%USER%_rtorrent
+      - WEBROOT=%URI%
     ports:
       - %PORT%:45000
     volumes:
