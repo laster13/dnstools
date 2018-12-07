@@ -28,9 +28,16 @@ GROUPFILE="/etc/seedboxcompose/group"
 INFOLOGS="/var/log/seedboxcompose.info.log"
 ERRORLOGS="/var/log/seedboxcompose.error.log"
 
+export NEWT_COLORS='
+  window=,white
+  border=green,blue
+  textbox=black,white
+'
+
 clear
 
 if [ $USER = "root" ] ; then
+
 	check_dir $PWD
 	script_option
 	case $SCRIPT in

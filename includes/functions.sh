@@ -117,11 +117,6 @@ function install_base_packages() {
 	echo ""
 }
 
-function delete_htaccess() {
-	SITEENABLEDFOLDER="/etc/nginx/conf.d/"
-	sed -ri 's///g' /etc/
-}
-
 function checking_system() {
 	echo -e "${BLUE}### CHECKING SYSTEM ###${NC}"
 	echo -e " ${BWHITE}* Checking system OS${NC}"
@@ -391,10 +386,11 @@ function install_services() {
 
 	DOCKERCOMPOSEFILE="/home/$SEEDUSER/docker-compose.yml"
 	touch $DOCKERCOMPOSEFILE
+	cat /opt/seedbox-compose/includes/dockerapps/head.docker > $DOCKERCOMPOSEFILE
 	for line in $(cat $SERVICESPERUSER);
 	do
 		#check_domain "$line.$DOMAIN"
-		cat /opt/seedbox-compose/includes/dockerapps/head.docker > $DOCKERCOMPOSEFILE
+		
 		cat "/opt/seedbox-compose/includes/dockerapps/$line.yml" >> $DOCKERCOMPOSEFILE
 		sed -i "s|%TIMEZONE%|$TIMEZONE|g" $DOCKERCOMPOSEFILE
 		sed -i "s|%UID%|$USERID|g" $DOCKERCOMPOSEFILE
@@ -405,7 +401,7 @@ function install_services() {
 		sed -i "s|%USER%|$SEEDUSER|g" $DOCKERCOMPOSEFILE
 		sed -i "s|%EMAIL%|$CONTACTEMAIL|g" $DOCKERCOMPOSEFILE
 		sed -i "s|%IPADDRESS%|$IPADDRESS|g" $DOCKERCOMPOSEFILE
-		cat /opt/seedbox-compose/includes/dockerapps/foot.docker >> $DOCKERCOMPOSEFILE
+
 
 		SUBURI=$(whiptail --title "Access Type" --menu \
 	            "Please choose how do you want access your Apps :" 10 45 2 \
@@ -435,8 +431,10 @@ function install_services() {
 				URI=$ACCESSURL
 				TRAEFIKURL=(Host:$DOMAIN';'PathPrefix:$URI)
 				sed -i "s|%TRAEFIKURL%|$TRAEFIKURL|g" /home/$SEEDUSER/docker-compose.yml
+				sed -i "s|%URI%|$URI|g" /home/$SEEDUSER/docker-compose.yml
 				check_domain $DOMAIN
 				echo "$line-$PORT-$FQDN$URI" >> $INSTALLEDFILE
+				
 			;;
 				
 	    	esac
@@ -444,7 +442,7 @@ function install_services() {
 		FQDN=""
 		FQDNTMP=""
 	done
-
+	cat /opt/seedbox-compose/includes/dockerapps/foot.docker >> $DOCKERCOMPOSEFILE
 
 	docker ps | grep watchtower > /dev/null 2>&1
 	if [[ "$?" != 0 ]]; then
@@ -463,6 +461,8 @@ function install_services() {
 }
 
 function add_install_services() {
+	USERID=$(id -u $SEEDUSER)
+	GRPID=$(id -g $SEEDUSER)
 	INSTALLEDFILE="/home/$SEEDUSER/resume"
 	touch $INSTALLEDFILE > /dev/null 2>&1
 	if [[ -f "$FILEPORTPATH" ]]; then
@@ -517,6 +517,7 @@ function add_install_services() {
 				URI=$ACCESSURL
 				TRAEFIKURL=(Host:$DOMAIN';'PathPrefix:$URI)
 				sed -i "s|%TRAEFIKURL%|$TRAEFIKURL|g" /home/$SEEDUSER/docker-compose.yml
+				sed -i "s|%URI%|$URI|g" /home/$SEEDUSER/docker-compose.yml
 				check_domain $DOMAIN
 				echo "$line-$PORT-$FQDN$URI" >> $INSTALLEDFILE
 			;;
@@ -562,14 +563,13 @@ function docker_compose() {
 
 function config_post_compose() {
 	if [[ "$PROXYACCESS" == "URI" ]]; then
-		echo -e "${BLUE}### CONFIG POST COMPOSE ###${NC}"
+		echo -e "${BLUE}### CONFIG URI POST COMPOSE ###${NC}"
 		grep -R "sonarr" "$INSTALLEDFILE" > /dev/null 2>&1	
 		if [[ "$?" == "0" ]]; then
 			echo -e " ${BWHITE}* Processing sonarr config file...${NC}"
 			rm "/home/$SEEDUSER/sonarr/config/config.xml" > /dev/null 2>&1
 			cp "$BASEDIR/includes/config/sonarr.config.xml" "/home/$SEEDUSER/sonarr/config/config.xml" > /dev/null 2>&1
 			sed -i "s|%URI%|$URI|g" /home/$SEEDUSER/sonarr/config/config.xml
-			sed -i "s|%URI%|$URI|g" /home/$SEEDUSER/docker-compose.yml
 			docker restart sonarr-$SEEDUSER > /dev/null 2>&1
 			checking_errors $?
 		fi
@@ -584,7 +584,46 @@ function config_post_compose() {
 			docker restart radarr-$SEEDUSER > /dev/null 2>&1
 			checking_errors $?
 		fi
-	
+
+	else
+
+		grep -R "medusa" "$INSTALLEDFILE" > /dev/null 2>&1
+		if [[ "$?" == "0" ]]; then
+			echo -e " ${BWHITE}* Processing medusa config file...${NC}"
+			cd /home/$SEEDUSER/
+			sed -i '/MEDUSA_WEBROOT/d' docker-compose.yml
+			docker-compose rm -fs medusa-$SEEDUSER > /dev/null 2>&1 && docker-compose up -d medusa-$SEEDUSER > /dev/null 2>&1
+			checking_errors $?
+		fi
+
+		grep -R "sonarr" "$INSTALLEDFILE" > /dev/null 2>&1
+		if [[ "$?" == "0" ]]; then
+			echo -e " ${BWHITE}* Processing sonarr config file...${NC}"
+			cd /home/$SEEDUSER/
+			sed -i '/WEBROOT/d' docker-compose.yml
+			docker-compose rm -fs sonarr-$SEEDUSER > /dev/null 2>&1 && docker-compose up -d sonarr-$SEEDUSER > /dev/null 2>&1
+			checking_errors $?
+		fi
+
+		grep -R "radarr" "$INSTALLEDFILE" > /dev/null 2>&1
+		if [[ "$?" == "0" ]]; then
+			echo -e " ${BWHITE}* Processing radarr config file...${NC}"
+			cd /home/$SEEDUSER/
+			sed -i '/WEBROOT/d' docker-compose.yml
+			docker-compose rm -fs radarr-$SEEDUSER > /dev/null 2>&1 && docker-compose up -d radarr-$SEEDUSER > /dev/null 2>&1
+			checking_errors $?
+		fi
+
+		grep -R "rtorrent" "$INSTALLEDFILE" > /dev/null 2>&1
+		if [[ "$?" == "0" ]]; then
+			echo -e " ${BWHITE}* Processing rtorrent config file...${NC}"
+			cd /home/$SEEDUSER/
+			rm -rf rtorrent
+			sed -i '/WEBROOT/d' docker-compose.yml
+			docker-compose rm -fs rtorrent-$SEEDUSER > /dev/null 2>&1 && docker-compose up -d rtorrent-$SEEDUSER > /dev/null 2>&1
+			checking_errors $?
+		fi
+
 	fi
 }
 
@@ -634,7 +673,38 @@ function manage_users() {
 		"2" )
 			echo -e "${BLUE}### DELETE SEEDBOX USER ###${NC}"
 			echo -e "${BLUE}---------------------------${NC}"
-			echo -e "${RED}--> UNDER DEVELOPPMENT ! ${NC}"
+			echo -e "${RED}--> DELETE IN PROGRESS!! ${NC}"
+			echo ""
+			TMPGROUP=$(cat $GROUPFILE)
+			TABUSERS=()
+			for USERSEED in $(members $TMPGROUP)
+			do
+	        		IDSEEDUSER=$(id -u $USERSEED)
+	        		TABUSERS+=( ${USERSEED//\"} ${IDSEEDUSER//\"} )
+			done
+			## CHOOSE USER
+			SEEDUSER=$(whiptail --title "App Manager" --menu \
+	                		"Please select user to manage Apps" 12 50 3 \
+	                		"${TABUSERS[@]}"  3>&1 1>&2 2>&3)
+			[[ "$?" = 1 ]] && break;
+			## RESUME USER INFORMATIONS
+			USERDOCKERCOMPOSEFILE="/home/$SEEDUSER/docker-compose.yml"
+			USERRESUMEFILE="/home/$SEEDUSER/resume"
+			cd /home/$SEEDUSER
+			echo -e "${BLUE}### DELETE CONTAINERS ###${NC}"
+			checking_errors $?
+			docker-compose rm -fs > /dev/null 2>&1
+			echo ""
+		        echo -e "${BLUE}### DELETE USER ###${NC}"
+			rm -rf /home/$SEEDUSER > /dev/null 2>&1
+			userdel -rf $SEEDUSER > /dev/null 2>&1
+			sed -i "/$SEEDUSER/d" /etc/seedboxcompose/users
+			rm /etc/seedboxcompose/passwd/.htpasswd-$SEEDUSER
+			sed -n -i "/$SEEDUSER/!p" /etc/seedboxcompose/passwd/login
+			checking_errors $?
+			echo""
+			echo -e "${BLUE}### $SEEDUSER has been deleted ###${NC}"
+			echo ""
 			;;
 	esac
 }
