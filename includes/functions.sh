@@ -888,32 +888,6 @@ function install_ftp_server() {
 	echo ""
 }
 
-#function restart_docker_apps() {
-	# DOCKERS=$(docker ps --format "{{.Names}}")
-	# declare -i i=1
-	# declare -a TABAPP
-	# echo "	* [0] - All dockers (default)"
-	# while [ $i -le $(echo "$DOCKERS" | wc -w) ]
-	# do
-	# 	APP=$(echo $DOCKERS | cut -d\  -f$i)
-	# 	echo "	* [$i] - $APP"
-	# 	$TABAPP[$i]=$APP
-	# 	i=$i+1
-	# done
-	# read -p "Please enter the number you want to restart, let blank to default value (all) : " RESTARTAPP
-	# case $RESTARTAPP in
-	# "")
-	#   docker restart $(docker ps)
-	#   ;;
-	# "0")
-	#   docker restart $(docker ps)
-	#   ;;
-	# "1")
-	#   echo $TABAPP[1]
-	#   #docker restart TABAPP[1]
-	# esac
-#}
-
 function resume_seedbox() {
 	echo ""
 	echo -e "${BLUE}##########################################${NC}"
@@ -1059,27 +1033,6 @@ function schedule_backup_seedbox() {
 		fi
 	fi
 }
-
-# function access_token_ts() {
-# 	grep -R "teamspeak" "$SERVICESPERUSER" > /dev/null
-# 	if [[ "$?" == "0" ]]; then
-# 		read -p " * Do you want create a file with your Teamspeak password and Token ? (default no) [y/n] : " SHOWTSTOKEN
-# 		if [[ "$SHOWTSTOKEN" == "y" ]]; then
-# 			TSIDFILE="/home/$SEEDUSER/dockers/teamspeak/idteamspeak"
-# 			touch $TSIDFILE
-# 			SERVERADMINPASSWORD=$(docker logs teamspeak 2>&1 | grep password | cut -d\= -f 3 | tr --delete '"')
-# 			TOKEN=$(docker logs teamspeak 2>&1 | grep token | cut -d\= -f2)
-# 			echo "Admin Username : serveradmin" >> $TSIDFILE
-# 			echo "Admin password : $SERVERADMINPASSWORD" >> $TSIDFILE
-# 			echo "Token : $TOKEN" >> $TSIDFILE
-# 			echo -e "	--> ${YELLOW}Admin username : serveradmin${NC}"
-# 			echo -e "	--> ${YELLOW}Admin password : $SERVERADMINPASSWORD${NC}"
-# 			echo -e "	--> ${YELLOW}Token : $TOKEN${NC}"
-# 		else
-# 			echo -e "	--> Check teamspeak's Logs with ${BWHITE}docker logs teamspeak${NC}"
-# 		fi
-# 	fi
-# }
 
 function uninstall_seedbox() {
 	clear
