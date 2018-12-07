@@ -1,7 +1,7 @@
 <Config>
   <LogLevel>Info</LogLevel>
   <Port>8989</Port>
-  <UrlBase>%SEEDUSER%_sonarr</UrlBase>
+  <UrlBase>%URI%</UrlBase>
   <BindAddress>*</BindAddress>
   <SslPort>9898</SslPort>
   <EnableSsl>False</EnableSsl>
