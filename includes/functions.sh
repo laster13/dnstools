@@ -101,7 +101,7 @@ function conf_dir() {
 function install_base_packages() {
 	echo ""
 	echo -e "${BLUE}### INSTALL BASE PACKAGES ###${NC}"
-	sed -ri 's/deb\ cdrom/#deb\ cdrom/g' /etc/apt/sources.list
+	#sed -ri 's/deb\ cdrom/#deb\ cdrom/g' /etc/apt/sources.list
 	whiptail --title "Base Package" --msgbox "Seedbox-Compose installer will now install base packages and update system" 10 60
 	echo -e " ${BWHITE}* Installing apache2-utils, unzip, git, curl ...${NC}"
 	{
