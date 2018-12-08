@@ -193,7 +193,6 @@ function install_traefik() {
 		sed -i "s|%TRAEFIK%|$TRAEFIK|g" $TRAEFIKCOMPOSEFILE
 		sed -i "s|%EMAIL%|$CONTACTEMAIL|g" $TRAEFIKTOML
 		sed -i "s|%DOMAIN%|$DOMAIN|g" $TRAEFIKTOML
-		echo -e " ${BWHITE}* Docker-composing, it may takes a long...${NC}"
 		cd $TRAEFIK
 		docker network create traefik_proxy > /dev/null 2>&1
 		docker-compose up -d > /dev/null 2>&1
