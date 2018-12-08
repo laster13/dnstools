@@ -443,19 +443,6 @@ function install_services() {
 		FQDNTMP=""
 	done
 	cat /opt/seedbox-compose/includes/dockerapps/foot.docker >> $DOCKERCOMPOSEFILE
-
-	docker ps | grep watchtower > /dev/null 2>&1
-	if [[ "$?" != 0 ]]; then
-		if (whiptail --title "Docker Watcher" --yesno "Do you want to install a Watcher to auto-update your containers ?" 8 80) then
-			echo -e " ${BWHITE}--> Watchtower will be installed !${NC}"
-			cat "/opt/seedbox-compose/includes/dockerapps/watchtower.yml" >> $DOCKERCOMPOSEFILE
-			checking_errors $?
-		else
-			echo -e " ${BWHITE}--> Watchtower will be skipped !${NC}"
-		fi
-	else
-		echo -e " ${BWHITE}--> Watchtower already running !${NC}"
-	fi
 	echo $PORT >> $FILEPORTPATH
 	echo ""
 }
@@ -526,21 +513,9 @@ function add_install_services() {
 		PORT=$PORT+1
 		FQDN=""
 		FQDNTMP=""
+		
 	done
-
-
-	docker ps | grep watchtower > /dev/null 2>&1
-	if [[ "$?" != 0 ]]; then
-		if (whiptail --title "Docker Watcher" --yesno "Do you want to install a Watcher to auto-update your containers ?" 8 80) then
-			echo -e " ${BWHITE}--> Watchtower will be installed !${NC}"
-			cat "/opt/seedbox-compose/includes/dockerapps/watchtower.yml" >> $DOCKERCOMPOSEFILE
-			checking_errors $?
-		else
-			echo -e " ${BWHITE}--> Watchtower will be skipped !${NC}"
-		fi
-	else
-		echo -e " ${BWHITE}--> Watchtower already running !${NC}"
-	fi
+	
 	echo $PORT >> $FILEPORTPATH
 	echo ""
 }
@@ -563,7 +538,7 @@ function docker_compose() {
 
 function config_post_compose() {
 	if [[ "$PROXYACCESS" == "URI" ]]; then
-		echo -e "${BLUE}### CONFIG URI POST COMPOSE ###${NC}"
+		echo -e "${BLUE}### CONFIG POST COMPOSE ###${NC}"
 		grep -R "sonarr" "$INSTALLEDFILE" > /dev/null 2>&1	
 		if [[ "$?" == "0" ]]; then
 			echo -e " ${BWHITE}* Processing sonarr config file...${NC}"
@@ -586,7 +561,8 @@ function config_post_compose() {
 		fi
 
 	else
-
+		
+		echo -e "${BLUE}### CONFIG POST COMPOSE ###${NC}"
 		grep -R "medusa" "$INSTALLEDFILE" > /dev/null 2>&1
 		if [[ "$?" == "0" ]]; then
 			echo -e " ${BWHITE}* Processing medusa config file...${NC}"
