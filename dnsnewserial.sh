@@ -9,7 +9,7 @@
 # Check arguments
 if [ $# -ne 1 ]
 then
-        echo "Provide /mnt/docker/nsd/zones/db.lastharo.com as argument!" # modifier avec votre fichier de zone
+        echo "Provide /mnt/docker/nsd/zones/db.domaine.com as argument!" # modifier avec votre fichier de zone
         exit 1
 fi
 
