@@ -8,7 +8,7 @@ SLACK_HOOK=https://hooks.slack.com/services/TBFNA2Y57/BBH66G022/F06eAOJKC1PotXBu
 # par acme.sh à partir de mondedie-web
 fingerprint=$1
 
-domain="lastharo.com"
+domain="domaine.com"
 zonename="db.${domain}"
 zonefile="/mnt/docker/nsd/zones/${zonename}"
 tlsa_line_number=$(grep -n TLSA $zonefile | cut -d : -f 1)
