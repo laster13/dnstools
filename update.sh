@@ -35,6 +35,7 @@ PLEXPORTPATH="/opt/seedbox/plex.pt"
 PACKAGESFILE="$BASEDIR/includes/config/packages"
 USERSFILE="/opt/seedbox/users"
 GROUPFILE="/opt/seedbox/group"
+SEEDUSER="cat /opt/seedbox/user" ## A verifer
 
 function install_traefik() {
 	echo -e "${BLUE}### TRAEFIK ###${NC}"
@@ -108,4 +109,13 @@ function checking_errors() {
 	rm -rf /opt/seedbox/docker/traefik > /dev/null 2>&1
 	checking_errors $?
 	
+	echo -e " ${BWHITE}* Installation traefik${NC}"
+	install_traefik
+	checking_errors $?
 	
+	echo -e " ${BWHITE}* Mise à jour des containers${NC}"
+	SERVICESPERUSER="$SERVICESUSER$SEEDUSER"
+	while read line; do echo $line | cut -d'-' -f1; done < /home/$SEEDUSER/resume > $SERVICESUSER$SEEDUSER
+	mv /home/$SEEDUSER/resume /tmp
+	install_services
+	checking_errors $?
