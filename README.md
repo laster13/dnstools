@@ -54,3 +54,38 @@ Then click the following button to create an API key in the same project:</p>
 
 
 <p>
+
+<style>
+  /* Remove extra DevSite2 margin */
+  .github-docwidget-gitinclude-code devsite-code {
+    margin: 0;
+  }
+  /* Remove extra DevSite2 padding */
+  devsite-selector>section[active] {
+    padding: 0;
+  }
+  /* Disables includecode margin */
+  .github-docwidget-gitinclude-code .prettyprint {
+    margin: 0;
+  }
+  .ds-selector-tabs > section > p { /* Remove extra <p>: b/19236190 */
+    display: none;
+  }
+  .kd-tabbed-horz > article > pre { /* Remove extra spacing */
+    margin: 0;
+  }
+  .ds-selector-tabs > section { /* Remove code section padding */
+    padding: 0;
+  }
+  .filepath {
+    color: #fff;
+    margin: 6px;
+    max-width: calc(100% - 160px); /* Give at least 160px for the "View on GitHub" button. */
+    text-overflow: ellipsis;
+    text-shadow: rgba(0,0,0,0.1) 1px 1px;
+    overflow: hidden;
+  }
+  .view-on-github {
+    text-shadow: rgba(12,12,12,0.1) 1px 1px;
+  }
+</style>
